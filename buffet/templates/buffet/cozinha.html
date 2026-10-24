@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Planejamento de Cozinha - MVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    
+    <!-- Topo / Header -->
+    <header class="bg-white shadow p-4 flex justify-between items-center px-8">
+        <h1 class="text-xl font-bold text-gray-800">Sistema Buffet [MVP]</h1>
+        <div class="text-gray-600">Usuário: <strong>Fábio</strong> | <a href="/admin/" class="text-blue-600 underline">Admin do Django</a></div>
+    </header>
+
+    <div class="flex">
+        <!-- Menu Lateral -->
+        <aside class="w-64 bg-white h-screen shadow-md p-6 hidden md:block">
+            <h2 class="text-gray-400 uppercase text-xs font-bold mb-4">Menu Lateral</h2>
+            <ul class="space-y-2">
+                <li><a href="/" class="block p-2 rounded hover:bg-gray-50 text-gray-700">1. Dashboard Geral</a></li>
+                <li><a href="/cozinha/" class="block p-2 rounded hover:bg-gray-50 text-gray-700">4. Cozinha (Explosão)</a></li>
+                <li><a href="/equipe/" class="block p-2 rounded hover:bg-gray-50 text-gray-700">5. Escala de Equipe</a></li>
+                <li><a href="/financeiro/" class="block p-2 rounded hover:bg-gray-50 text-gray-700">6. Financeiro / DRE</a></li>
+            </ul>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="flex-1 p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Planejamento de Insumos (Explosão de Cardápio)</h2>
+
+            <!-- Formulário de Seleção do Evento -->
+            <div class="bg-white rounded shadow p-6 mb-6">
+                <form method="GET" action="" class="flex items-center gap-4">
+                    <label for="evento_id" class="font-semibold text-gray-700">Selecione o Evento:</label>
+                    <select name="evento_id" id="evento_id" class="border p-2 rounded flex-1 max-w-md">
+                        <option value="">-- Selecione um evento --</option>
+                        {% for ev in eventos %}
+                            <option value="{{ ev.id }}" {% if evento_selecionado and evento_selecionado.id == ev.id %}selected{% endif %}>
+                                {{ ev.nome_evento }} - {{ ev.nome_cliente }} ({{ ev.data_hora|date:"d/m/Y" }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Calcular Ordem de Compra</button>
+                </form>
+            </div>
+
+            {% if evento_selecionado %}
+            <!-- Detalhes do Evento Selecionado -->
+            <div class="bg-white rounded shadow p-6 mb-6">
+                <p class="text-gray-700"><strong>Cliente / Evento:</strong> {{ evento_selecionado.nome_evento }} - {{ evento_selecionado.nome_cliente }}</p>
+                <p class="text-gray-700"><strong>Número de Convidados Confirmados:</strong> {{ evento_selecionado.numero_convidados }} pessoas</p>
+                <p class="text-gray-700 mt-2"><strong>Cardápio Vinculado:</strong> 
+                    {% for rec in evento_selecionado.cardapio.all %}
+                        <span class="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded mr-1">{{ rec.nome }}</span>
+                    {% empty %}
+                        <span class="text-red-500">Nenhum prato vinculado a este evento ainda.</span>
+                    {% endfor %}
+                </p>
+            </div>
+
+            <!-- Tabela da Lista de Compras Calculada -->
+            <div class="bg-white rounded shadow p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">=== LISTA DE COMPRAS CALCULADA ===</h3>
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b text-gray-600 text-sm">
+                            <th class="py-2">Ingrediente / Insumo</th>
+                            <th class="py-2">Qtd Necessária</th>
+                            <th class="py-2">Estoque Atual</th>
+                            <th class="py-2">Status / Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in lista_compras %}
+                        <tr class="border-b text-gray-700">
+                            <td class="py-3 font-semibold">{{ item.ingrediente }}</td>
+                            <td class="py-3">{{ item.qtd_necessaria }} {{ item.unidade }}</td>
+                            <td class="py-3">{{ item.estoque_atual }} {{ item.unidade }}</td>
+                            <td class="py-3">
+                                {% if "Faltam" in item.status %}
+                                    <span class="text-red-600 font-bold">🔴 {{ item.status }}</span>
+                                {% else %}
+                                    <span class="text-green-600 font-semibold">🟢 Suficiente (OK)</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="py-4 text-center text-gray-500">Nenhum insumo calculado. Verifique se o evento possui receitas vinculadas no cardápio.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

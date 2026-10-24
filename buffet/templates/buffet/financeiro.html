@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Financeiro e DRE - MVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    
+    <!-- Topo / Header -->
+    <header class="bg-white shadow p-4 flex justify-between items-center px-8">
+        <h1 class="text-xl font-bold text-gray-800">Sistema Buffet [MVP]</h1>
+        <div class="text-gray-600">Usuário: <strong>Fábio</strong> | <a href="/admin/" class="text-blue-600 underline">Admin do Django</a></div>
+    </header>
+
+    <div class="flex">
+        <!-- Menu Lateral -->
+        <aside class="w-64 bg-white h-screen shadow-md p-6 hidden md:block">
+            <h2 class="text-gray-400 uppercase text-xs font-bold mb-4">Menu Lateral</h2>
+            <ul class="space-y-2">
+                <li><a href="/" class="block p-2 rounded hover:bg-gray-50 text-gray-700">1. Dashboard Geral</a></li>
+                <li><a href="/cozinha/" class="block p-2 rounded hover:bg-gray-50 text-gray-700">4. Cozinha (Explosão)</a></li>
+                <li><a href="/equipe/" class="block p-2 rounded hover:bg-gray-50 text-gray-700">5. Escala de Equipe</a></li>
+                <li><a href="/financeiro/" class="block p-2 rounded hover:bg-gray-50 text-gray-700">6. Financeiro / DRE</a></li>
+            </ul>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="flex-1 p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Controlo Financeiro e DRE</h2>
+
+            <!-- Cards de Resumo -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white rounded shadow p-6 border-l-4 border-green-500">
+                    <p class="text-gray-500 text-sm font-semibold uppercase">Total Receitas</p>
+                    <p class="text-2xl font-bold text-green-600">R$ {{ total_receitas }}</p>
+                </div>
+                <div class="bg-white rounded shadow p-6 border-l-4 border-red-500">
+                    <p class="text-gray-500 text-sm font-semibold uppercase">Total Despesas</p>
+                    <p class="text-2xl font-bold text-red-600">R$ {{ total_despesas }}</p>
+                </div>
+                <div class="bg-white rounded shadow p-6 border-l-4 border-blue-500">
+                    <p class="text-gray-500 text-sm font-semibold uppercase">Lucro Líquido (DRE)</p>
+                    <p class="text-2xl font-bold text-blue-600">R$ {{ lucro_liquido }}</p>
+                </div>
+            </div>
+
+            <!-- Tabela de Transações -->
+            <div class="bg-white rounded shadow p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">=== HISTÓRICO DE TRANSAÇÕES ===</h3>
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b text-gray-600 text-sm">
+                            <th class="py-2">Data</th>
+                            <th class="py-2">Descrição</th>
+                            <th class="py-2">Tipo</th>
+                            <th class="py-2">Valor</th>
+                            <th class="py-2">Evento Vinculado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transacoes %}
+                        <tr class="border-b text-gray-700">
+                            <td class="py-3">{{ t.data|date:"d/m/Y" }}</td>
+                            <td class="py-3 font-semibold">{{ t.descricao }}</td>
+                            <td class="py-3">
+                                {% if t.tipo == 'RECEITA' %}
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-bold">RECEITA</span>
+                                {% else %}
+                                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded font-bold">DESPESA</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 font-bold {% if t.tipo == 'RECEITA' %}text-green-600{% else %}text-red-600{% endif %}">
+                                R$ {{ t.valor }}
+                            </td>
+                            <td class="py-3">{{ t.evento.nome_evento|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-4 text-center text-gray-500">Nenhuma transação registada ainda. Adicione em "Gerenciar Transações" no painel Admin.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
