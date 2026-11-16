@@ -39,7 +39,7 @@
                     <td class="py-3">{{ evento.data_hora|date:"d/m/Y H:i" }}</td>
                     <td class="py-3 font-semibold">{{ evento.nome_evento }} - {{ evento.nome_cliente }}</td>
                     <td class="py-3">{{ evento.numero_convidados }} pax</td>
-                    <td class="py-3"><a href="/admin/buffet/evento/{{ evento.id }}/change/" class="text-blue-600 hover:underline">[Ver no Admin]</a></td>
+                    <td class="py-3"><a href="{% url 'evento_detalhe' evento.id %}" class="text-blue-600 hover:underline font-semibold">[Ver Detalhes do Evento]</a></td>
                 </tr>
                 {% empty %}
                 <tr>
