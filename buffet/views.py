@@ -1,5 +1,5 @@
 from django.db.models import Sum
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from .models import Colaborador, EscalaEvento, Evento, Ingrediente, TransacaoFinanceira
 
 
@@ -130,3 +130,34 @@ def financeiro_view(request):
         'lucro_liquido': lucro_liquido,
     }
     return render(request, 'buffet/financeiro.html', context)
+
+def evento_detalhe_view(request, evento_id):
+  """Página 2 e 3 do Wireframe: Detalhes, Logística e Fechamento Pós-Evento"""
+  evento = get_object_or_404(Evento, id=evento_id)
+  escalas = EscalaEvento.objects.filter(evento=evento)
+
+  # Ação POST para concluir o fechamento pós-evento
+  if request.method == 'POST':
+    acao = request.POST.get('acao')
+    if acao == 'concluir_fechamento':
+      evento.status = 'Realizado / Fechado'
+      evento.save()
+
+      # Opcional: Gerar automaticamente a transação financeira de receita do evento se houver preço de contrato
+      if evento.preco_contrato:
+        TransacaoFinanceira.objects.get_or_create(
+            descricao=(
+                f'Receita Evento: {evento.nome_evento} - {evento.nome_cliente}'
+            ),
+            tipo='RECEITA',
+            valor=evento.preco_contrato,
+            data=evento.data_hora.date(),
+            evento=evento,
+        )
+      return redirect('evento_detalhe', evento_id=evento.id)
+
+  context = {
+      'evento': evento,
+      'escalas': escalas,
+  }
+  return render(request, 'buffet/evento_detalhe.html', context)

@@ -1,0 +1,103 @@
+{% extends 'buffet/base.html' %}
+
+{% block title %}Detalhes do Evento - Buffet System AI{% endblock %}
+
+{% block content %}
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Gestão do Evento: {{ evento.nome_evento }}</h2>
+            <p class="text-gray-600">Cliente: <strong>{{ evento.nome_cliente }}</strong> | Status: <span class="px-2 py-1 text-xs rounded font-bold {% if evento.status == 'Realizado / Fechado' %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">{{ evento.status }}</span></p>
+        </div>
+        <a href="{% url 'agenda' %}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-sm font-semibold">< Voltar para Agenda</a>
+    </div>
+
+    <!-- Sub-menu lateral visual simulando as abas 2.1 a 2.5 do wireframe -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <!-- Menu lateral de secções do evento -->
+        <div class="bg-white p-4 rounded shadow h-fit">
+            <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Menu do Evento</h3>
+            <ul class="space-y-2 text-sm">
+                <li><a href="#resumo" class="block p-2 rounded hover:bg-gray-100 font-semibold text-blue-600">2.1- Resumo Geral</a></li>
+                <li><a href="#compras" class="block p-2 rounded hover:bg-gray-100 font-semibold text-gray-700">2.2- Compra e Estoque</a></li>
+                <li><a href="#esquipe" class="block p-2 rounded hover:bg-gray-100 font-semibold text-gray-700">2.3- Escala de Equipe</a></li>
+                <li><a href="#logistica" class="block p-2 rounded hover:bg-gray-100 font-semibold text-gray-700">2.4- Logística/Separação</a></li>
+                <li><a href="#fechamento" class="block p-2 rounded hover:bg-gray-100 font-semibold text-gray-700">2.5- Fechamento Pós</a></li>
+            </ul>
+        </div>
+
+        <!-- Conteúdo principal dividido por blocos dos wireframes -->
+        <div class="lg:col-span-3 space-y-6">
+            
+            <!-- 2.1 Resumo Geral -->
+            <div id="resumo" class="bg-white p-6 rounded shadow">
+                <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">2.1 Resumo Geral</h3>
+                <p class="text-gray-700 text-lg">{{ evento.nome_evento }} no dia <strong>{{ evento.data_hora|date:"d/m/Y" }}</strong> das <strong>{{ evento.data_hora|date:"H:i" }}</strong> para <strong>{{ evento.numero_convidados }} pessoas</strong>.</p>
+                <div class="mt-4 flex gap-2">
+                    <a href="{% url 'cozinha' %}?evento_id={{ evento.id }}" class="bg-blue-600 text-white text-xs px-3 py-2 rounded hover:bg-blue-700 font-semibold">Ver Explosão de Insumos (Cozinha)</a>
+                </div>
+            </div>
+
+            <!-- 2.2 Compra e Estoque -->
+            <div id="compras" class="bg-white p-6 rounded shadow">
+                <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">2.2 Compra e Estoque</h3>
+                <p class="text-gray-600 text-sm mb-3">Status: Lista de compras calculada com base nas receitas vinculadas.</p>
+                <div class="flex gap-2">
+                    <a href="{% url 'cozinha' %}?evento_id={{ evento.id }}" class="border border-gray-300 text-gray-700 text-xs px-3 py-2 rounded hover:bg-gray-50 font-semibold">[ Visualizar Lista de Compras ]</a>
+                </div>
+            </div>
+
+            <!-- 2.3 Escala de Equipe -->
+            <div id="esquipe" class="bg-white p-6 rounded shadow">
+                <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">2.3 Escala de Equipe</h3>
+                <p class="text-gray-600 text-sm mb-3">Profissionais alocados para este evento:</p>
+                <ul class="space-y-2 mb-4">
+                    {% for esc in escalas %}
+                    <li class="flex justify-between items-center border-b pb-2 text-sm">
+                        <span><strong>{{ esc.colaborador.nome }}</strong> ({{ esc.funcao }}) - Diária: R$ {{ esc.valor_diaria }}</span>
+                        <a href="https://wa.me/{{ esc.colaborador.telefone }}?text=Olá%20{{ esc.colaborador.nome|urlencode }},%20lembrete%20do%20evento%20{{ evento.nome_evento|urlencode }}." target="_blank" class="text-green-600 font-bold hover:underline">[ WhatsApp ]</a>
+                    </li>
+                    {% empty %}
+                    <li class="text-gray-500 text-sm">Nenhum colaborador escalado especificamente para este evento.</li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'equipe' %}" class="border border-gray-300 text-gray-700 text-xs px-3 py-2 rounded hover:bg-gray-50 font-semibold">[ Gerenciar Escala ]</a>
+            </div>
+
+            <!-- 2.4 Logística / Separação -->
+            <div id="logistica" class="bg-white p-6 rounded shadow">
+                <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">2.4 Logística / Separação</h3>
+                <p class="text-gray-600 text-sm mb-3">Status: Checklist de toalhas, réchauds e louças.</p>
+                <button type="button" onclick="alert('Módulo de checklist logístico em desenvolvimento.')" class="border border-gray-300 text-gray-700 text-xs px-3 py-2 rounded hover:bg-gray-50 font-semibold">[ Abrir Checklist de Carga ]</button>
+            </div>
+
+            <!-- 2.5 Fechamento Pós-Evento -->
+            <div id="fechamento" class="bg-white p-6 rounded shadow border-2 border-blue-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">2.5 Fechamento Pós-Evento</h3>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="acao" value="concluir_fechamento">
+                    
+                    <div class="mb-4 text-sm space-y-2 text-gray-700">
+                        <p><strong>=== 1. ACERTO DE ESTOQUE ===</strong><br>O sistema já realizou a baixa teórica dos insumos. Confira sobras de bebidas ou quebras de louças se necessário.</p>
+                        <p><strong>=== 2. APURAÇÃO FINANCEIRA DO EVENTO (DRE) ===</strong></p>
+                        <ul class="list-disc pl-5">
+                            <li>Preço do Contrato / Receita: <strong>R$ {{ evento.preco_contrato|default:"0.00" }}</strong></li>
+                            <li>Custo Estimado de Insumos: <strong>R$ {{ evento.custo_total_insumos|floatformat:2 }}</strong></li>
+                        </ul>
+                    </div>
+
+                    {% if evento.status != 'Realizado / Fechado' %}
+                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-bold text-sm">
+                        ✅ [ Concluir Fechamento e Gerar Receita ]
+                    </button>
+                    {% else %}
+                    <p class="text-green-600 font-bold text-sm">✔️ Este evento já foi concluído e fechado com sucesso!</p>
+                    {% endif %}
+                </form>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
