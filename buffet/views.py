@@ -1,6 +1,7 @@
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Colaborador, EscalaEvento, Evento, Ingrediente, TransacaoFinanceira
+from .forms import EventoForm
 
 
 def dashboard_view(request):
@@ -161,3 +162,18 @@ def evento_detalhe_view(request, evento_id):
       'escalas': escalas,
   }
   return render(request, 'buffet/evento_detalhe.html', context)
+
+def evento_criar_view(request):
+  """Página para cadastrar um novo evento"""
+  if request.method == 'POST':
+    form = EventoForm(request.POST)
+    if form.is_valid():
+      evento = form.save()
+      return redirect('evento_detalhe', evento_id=evento.id)
+  else:
+    form = EventoForm()
+
+  context = {
+      'form': form,
+  }
+  return render(request, 'buffet/evento_form.html', context)

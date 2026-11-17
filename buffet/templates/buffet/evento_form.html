@@ -1,0 +1,66 @@
+{% extends 'buffet/base.html' %}
+
+{% block title %}Novo Evento - Buffet System AI{% endblock %}
+
+{% block content %}
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded shadow">
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <h2 class="text-2xl font-bold text-gray-800">Cadastrar Novo Evento</h2>
+            <a href="{% url 'agenda' %}" class="bg-gray-500 text-white text-sm px-4 py-2 rounded hover:bg-gray-600 font-semibold">< Voltar</a>
+        </div>
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            
+            {{ form.non_field_errors }}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Nome do Cliente:</label>
+                    {{ form.nome_cliente }}
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Nome / Tipo do Evento:</label>
+                    {{ form.nome_evento }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Data e Hora:</label>
+                    {{ form.data_hora }}
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Número de Convidados:</label>
+                    {{ form.numero_convidados }}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Cardápio (Selecione as Receitas):</label>
+                {{ form.cardapio }}
+                <p class="text-xs text-gray-500 mt-1">Pressione Ctrl (ou Cmd no Mac) para selecionar mais de uma receita.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Markup Aplicado:</label>
+                    {{ form.markup_aplicado }}
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Preço do Contrato (R$):</label>
+                    {{ form.preco_contrato }}
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Status:</label>
+                    {{ form.status }}
+                </div>
+            </div>
+
+            <div class="pt-4 flex justify-end gap-4 border-t">
+                <a href="{% url 'agenda' %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded font-semibold hover:bg-gray-400">Cancelar</a>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">💾 Salvar Evento</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

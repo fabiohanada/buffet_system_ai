@@ -13,4 +13,5 @@ urlpatterns = [
         views.evento_detalhe_view,
         name='evento_detalhe',
     ),
+    path('evento/novo/', views.evento_criar_view, name='evento_criar'),
 ]

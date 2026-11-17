@@ -5,6 +5,10 @@
 {% block content %}
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Dashboard Geral</h2>
 
+    <!-- BOTÃO NOVO EVENTO AQUI -->
+    <a href="{% url 'evento_criar' %}" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded shadow flex items-center gap-2">
+        ➕ Novo Evento
+    </a>
     <!-- Cards de Indicadores -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded shadow">
