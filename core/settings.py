@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv(
 )
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.onrender.com']
 
 
 # Application definition
@@ -73,19 +73,18 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
-
-if DATABASE_URL and not DATABASE_URL.startswith('sqlite'):
-    # Configuração para o Supabase / PostgreSQL em produção
+# Configuração Inteligente:
+# Se estiver na Render (variável RENDER presente), usa o Supabase/PostgreSQL do ambiente.
+# Caso contrário (rodando no seu PC), usa o SQLite local, ignorando o DATABASE_URL do .env.
+if os.getenv('RENDER') or os.getenv('ENVIRONMENT') == 'production':
     DATABASES = {
         'default': dj_database_url.config(
-            default=DATABASE_URL,
+            default=os.getenv('DATABASE_URL'),
             conn_max_age=600,
             ssl_require=True,
         )
     }
 else:
-    # Configuração segura para o SQLite local (ignora qualquer sslmode)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -135,8 +134,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
