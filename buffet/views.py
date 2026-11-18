@@ -2,20 +2,61 @@ from django.db.models import Sum
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Colaborador, EscalaEvento, Evento, Ingrediente, TransacaoFinanceira
 from .forms import EventoForm
-
+import calendar
+from datetime import datetime
+from django.shortcuts import render
+from django.db import models
 
 def dashboard_view(request):
-    eventos = Evento.objects.all().order_by('data_hora')
-    ingredientes_criticos = [
-        i for i in Ingrediente.objects.all() if i.status_estoque == 'Crítico / Baixo'
-    ]
+  hoje = datetime.now()
+  ano = int(request.GET.get('ano', hoje.year))
+  mes = int(request.GET.get('mes', hoje.month))
 
-    context = {
-        'eventos': eventos,
-        'ingredientes_criticos': ingredientes_criticos,
-    }
-    return render(request, 'buffet/dashboard.html', context)
+  # Cálculo para as setas de navegação de meses (Anterior / Próximo)
+  mes_ant = mes - 1
+  ano_ant = ano
+  if mes_ant < 1:
+    mes_ant = 12
+    ano_ant = ano - 1
 
+  mes_prox = mes + 1
+  ano_prox = ano
+  if mes_prox > 12:
+    mes_prox = 1
+    ano_prox = ano + 1
+
+  # Instancia o calendário
+  cal = calendar.Calendar(firstweekday=6)  # Começa no Domingo
+  dias_mes = cal.monthdayscalendar(ano, mes)
+
+  # Busca eventos do mês para marcar no calendário
+  eventos_mes = Evento.objects.filter(
+      data_hora__year=ano, data_hora__month=mes
+  )
+
+  # Mapeia os dias que possuem eventos
+  eventos_por_dia = {}
+  for ev in eventos_mes:
+    dia = ev.data_hora.day
+    if dia not in eventos_por_dia:
+      eventos_por_dia[dia] = []
+    eventos_por_dia[dia].append(ev)
+
+  eventos = Evento.objects.all().order_by('data_hora')[:5]
+
+  context = {
+      'eventos': eventos,
+      'ano': ano,
+      'mes': mes,
+      'mes_ant': mes_ant,
+      'ano_ant': ano_ant,
+      'mes_prox': mes_prox,
+      'ano_prox': ano_prox,
+      'nome_mes': calendar.month_name[mes],
+      'dias_mes': dias_mes,
+      'eventos_por_dia': eventos_por_dia,
+  }
+  return render(request, 'buffet/dashboard.html', context)
 
 def agenda_view(request):
     """Página 3: Agenda de Eventos"""

@@ -3,25 +3,77 @@
 {% block title %}Dashboard Geral - Buffet System AI{% endblock %}
 
 {% block content %}
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Dashboard Geral</h2>
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Dashboard Geral</h2>
+        <!-- BOTÃO NOVO EVENTO -->
+        <a href="{% url 'evento_criar' %}" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded shadow flex items-center gap-2">
+            ➕ Novo Evento
+        </a>
+    </div>
 
-    <!-- BOTÃO NOVO EVENTO AQUI -->
-    <a href="{% url 'evento_criar' %}" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded shadow flex items-center gap-2">
-        ➕ Novo Evento
-    </a>
-    <!-- Cards de Indicadores -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white p-6 rounded shadow">
-            <p class="text-gray-500 text-sm">Eventos Cadastrados</p>
-            <p class="text-2xl font-bold text-gray-800">{{ eventos.count }}</p>
+    <!-- Calendário Unificado de Eventos (Com navegação de meses e colunas corrigidas) -->
+    <div class="bg-white rounded shadow p-6 mb-8">
+        <div class="flex justify-between items-center mb-4 border-b pb-3">
+            <div class="flex items-center gap-4">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    📅 Calendário de Eventos ({{ nome_mes }} / {{ ano }})
+                </h3>
+                <!-- Setas de Navegação (Mês Anterior / Próximo) -->
+                <div class="flex items-center gap-1 bg-gray-100 rounded p-1 border">
+                    <a href="?ano={{ ano_ant }}&mes={{ mes_ant }}" class="px-2 py-1 text-xs font-bold text-gray-700 hover:bg-gray-200 rounded" title="Mês Anterior">← Ant</a>
+                    <span class="text-gray-300">|</span>
+                    <a href="?ano={{ ano_prox }}&mes={{ mes_prox }}" class="px-2 py-1 text-xs font-bold text-gray-700 hover:bg-gray-200 rounded" title="Próximo Mês">Pró →</a>
+                </div>
+            </div>
+            <div class="flex gap-4 text-xs font-semibold text-gray-600">
+                <span class="flex items-center gap-1"><span class="w-3 h-3 bg-orange-400 rounded-full inline-block"></span> Eventos Agendados</span>
+            </div>
         </div>
-        <div class="bg-white p-6 rounded shadow">
-            <p class="text-gray-500 text-sm">Status do Sistema</p>
-            <p class="text-2xl font-bold text-green-600">Online (Supabase)</p>
-        </div>
-        <div class="bg-white p-6 rounded shadow">
-            <p class="text-gray-500 text-sm">Alertas de Estoque</p>
-            <p class="text-2xl font-bold text-red-500">{{ ingredientes_criticos|length }} Itens Críticos</p>
+
+        <!-- Grelha do Calendário (table-fixed garante largura igualitária para todas as 7 colunas) -->
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse table-fixed text-center">
+                <thead>
+                    <tr class="text-gray-400 text-xs uppercase bg-gray-50 border-b">
+                        <th class="py-2 w-[14.28%]">Dom</th>
+                        <th class="py-2 w-[14.28%]">Seg</th>
+                        <th class="py-2 w-[14.28%]">Ter</th>
+                        <th class="py-2 w-[14.28%]">Qua</th>
+                        <th class="py-2 w-[14.28%]">Qui</th>
+                        <th class="py-2 w-[14.28%]">Sex</th>
+                        <th class="py-2 w-[14.28%]">Sáb</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm">
+                    {% for semana in dias_mes %}
+                    <tr class="border-b">
+                        {% for dia in semana %}
+                        <td class="h-28 align-top p-2 border-r relative {% if dia == 0 %}bg-gray-50{% endif %} overflow-hidden">
+                            {% if dia != 0 %}
+                                <span class="font-bold text-gray-700 text-xs block mb-1">{{ dia }}</span>
+                                
+                                <!-- Marcações dos eventos nos respetivos dias -->
+                                {% if eventos_por_dia %}
+                                    {% for d, lista_ev in eventos_por_dia.items %}
+                                        {% if d == dia %}
+                                            <div class="space-y-1">
+                                                {% for ev in lista_ev %}
+                                                    <a href="{% url 'evento_detalhe' ev.id %}" class="block bg-orange-100 text-orange-900 text-[11px] p-1 rounded font-bold hover:bg-orange-200 text-left truncate shadow-sm" title="{{ ev.nome_evento }} - {{ ev.nome_cliente }}">
+                                                        <div class="truncate">📍 {{ ev.nome_evento }}</div>
+                                                        <div class="text-[10px] text-gray-600 font-normal truncate">Cliente: {{ ev.nome_cliente }}</div>
+                                                    </a>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -47,7 +99,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="py-4 text-center text-gray-500">Nenhum evento cadastrado ainda. Cadastre pelo painel admin.</td>
+                    <td colspan="4" class="py-4 text-center text-gray-500">Nenhum evento cadastrado ainda.</td>
                 </tr>
                 {% endfor %}
             </tbody>

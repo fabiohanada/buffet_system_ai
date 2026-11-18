@@ -1,80 +1,38 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Buffet System AI{% endblock %}</title>
-    <style>
-        * { box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f4f4; color: #333; }
-        
-        /* Cabeçalho Superior */
-        .header { 
-            background: #dcdcdc; 
-            padding: 15px 30px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 2px solid #ccc; 
-            font-size: 16px;
-        }
-        .header .logo { font-weight: bold; font-size: 20px; }
-        
-        /* Layout Principal (Menu Lateral + Conteúdo) */
-        .main-layout { display: flex; height: calc(100vh - 60px); }
-        
-        /* Menu Lateral */
-        .sidebar { 
-            width: 260px; 
-            background: #d6d6d6; 
-            padding: 20px; 
-            border-right: 2px solid #ccc; 
-            overflow-y: auto;
-        }
-        .sidebar h3 { font-size: 16px; margin-top: 0; margin-bottom: 20px; }
-        .sidebar ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar li { margin-bottom: 12px; }
-        .sidebar a { text-decoration: none; color: #222; font-weight: bold; display: block; padding: 5px 0; }
-        .sidebar a:hover { color: #0056b3; text-decoration: underline; }
-        
-        /* Área de Conteúdo Dinâmico */
-        .content { 
-            flex-grow: 1; 
-            padding: 30px; 
-            background: #ebebeb; 
-            overflow-y: auto; 
-        }
-    </style>
+    <title>{% block title %}Sistema Buffet - MVP{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
+    
+    <!-- Topo / Header -->
+    <header class="bg-white shadow p-4 flex justify-between items-center px-8">
+        <h1 class="text-xl font-bold text-gray-800">Sistema Buffet [MVP]</h1>
+        <div class="text-gray-600">Usuário: <strong>Fábio</strong> | <a href="/admin/" class="text-blue-600 underline">Admin do Django</a></div>
+    </header>
 
-    <!-- Cabeçalho Padrão -->
-    <div class="header">
-        <div class="logo">Logo</div>
-        <div>Usuário: Fábio</div>
-        <div>Empresa: Buffet [<a href="#" style="color: #333; text-decoration: none; font-weight: bold;">Sair</a>]</div>
-    </div>
-
-    <!-- Estrutura com Menu Lateral e Ecrã de Conteúdo -->
-    <div class="main-layout">
-        <div class="sidebar">
-            <h3>Menu Lateral</h3>
-            <ul>
-                <li><a href="{% url 'dashboard' %}">1- Dashboard Geral</a></li>
-                <li><a href="{% url 'agenda' %}">2- Evento / Agenda</a></li>
-                <li><a href="{% url 'agenda' %}">3- Agenda</a></li>
-                <li><a href="{% url 'cozinha' %}">4- Cozinha</a></li>
-                <li><a href="{% url 'estoque' %}">5- Estoque</a></li>
-                <li><a href="{% url 'equipe' %}">6- Equipe</a></li>
-                <li><a href="{% url 'financeiro' %}">7- Financeiro - DRE</a></li>
+    <div class="flex">
+        <!-- Menu Lateral -->
+        <aside class="w-64 bg-white h-screen shadow-md p-6 hidden md:block">
+            <h2 class="text-gray-400 uppercase text-xs font-bold mb-4">Menu Lateral</h2>
+            <ul class="space-y-2 text-sm font-semibold">
+                <li><a href="{% url 'dashboard' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">1. Dashboard Geral</a></li>
+                <li><a href="{% url 'agenda' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">2. Evento / Agenda</a></li>
+                <li><a href="{% url 'agenda' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">3. Agenda</a></li>
+                <li><a href="{% url 'cozinha' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">4. Cozinha (Explosão)</a></li>
+                <li><a href="{% url 'equipe' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">5. Escala de Equipe</a></li>
+                <li><a href="{% url 'financeiro' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">6. Financeiro / DRE</a></li>
             </ul>
-        </div>
+        </aside>
 
-        <div class="content">
+        <!-- Conteúdo Principal -->
+        <main class="flex-1 p-8">
             {% block content %}
             <!-- O conteúdo específico de cada página entra aqui -->
             {% endblock %}
-        </div>
+        </main>
     </div>
-
 </body>
 </html>
