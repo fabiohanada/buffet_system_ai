@@ -14,4 +14,10 @@ urlpatterns = [
         name='evento_detalhe',
     ),
     path('evento/novo/', views.evento_criar_view, name='evento_criar'),
+    path('fichas/', views.receita_lista_view, name='receitas_lista'),
+    path(
+        'fichas/item/remover/<int:item_id>/',
+        views.item_receita_remover_view,
+        name='item_receita_remover',
+    ),
 ]

@@ -1,0 +1,94 @@
+{% extends 'buffet/base.html' %}
+
+{% block title %}Agenda de Eventos - Buffet System{% endblock %}
+
+{% block content %}
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Agenda de Eventos</h2>
+            <p class="text-sm text-gray-500">Acompanhamento cronológico, status e acesso rápido à operação de cada festa.</p>
+        </div>
+        <a href="{% url 'evento_criar' %}" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded shadow flex items-center gap-2 text-sm">
+            ➕ Novo Evento
+        </a>
+    </div>
+
+    <!-- Barra de Filtros Rápidos -->
+    <div class="bg-white rounded shadow p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap gap-2 text-xs font-semibold">
+            <a href="{% url 'agenda' %}" class="px-3 py-1.5 rounded border {% if not status_filtro %}bg-gray-800 text-white border-gray-800{% else %}bg-gray-50 text-gray-700 hover:bg-gray-100{% endif %}">
+                Todos
+            </a>
+            <a href="?status=Em Negociação" class="px-3 py-1.5 rounded border {% if status_filtro == 'Em Negociação' %}bg-blue-600 text-white border-blue-600{% else %}bg-gray-50 text-gray-700 hover:bg-gray-100{% endif %}">
+                Em Negociação
+            </a>
+            <a href="?status=Confirmado" class="px-3 py-1.5 rounded border {% if status_filtro == 'Confirmado' %}bg-green-600 text-white border-green-600{% else %}bg-gray-50 text-gray-700 hover:bg-gray-100{% endif %}">
+                Confirmado
+            </a>
+        </div>
+        <span class="text-xs text-gray-500 font-semibold">
+            Total exibido: {{ eventos|length }} evento(s)
+        </span>
+    </div>
+
+    <!-- Tabela da Agenda -->
+    <div class="bg-white rounded shadow p-6 overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b text-gray-500 text-xs uppercase bg-gray-50">
+                    <th class="py-3 px-3">Data / Hora</th>
+                    <th class="py-3 px-3">Evento</th>
+                    <th class="py-3 px-3">Cliente</th>
+                    <th class="py-3 px-3">Convidados</th>
+                    <th class="py-3 px-3">Custo Insumos (Est.)</th>
+                    <th class="py-3 px-3">Status</th>
+                    <th class="py-3 px-3 text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm text-gray-700 divide-y">
+                {% for evento in eventos %}
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-3 whitespace-nowrap font-semibold text-gray-800">
+                        {{ evento.data_hora|date:"d/m/Y" }}
+                        <span class="block text-xs text-gray-400 font-normal">{{ evento.data_hora|date:"H:i" }}</span>
+                    </td>
+                    <td class="py-3 px-3 font-bold text-gray-800">
+                        {{ evento.nome_evento }}
+                    </td>
+                    <td class="py-3 px-3">
+                        {{ evento.nome_cliente }}
+                    </td>
+                    <td class="py-3 px-3 whitespace-nowrap">
+                        {{ evento.numero_convidados }} pax
+                    </td>
+                    <td class="py-3 px-3 whitespace-nowrap font-semibold text-gray-800">
+                        R$ {{ evento.custo_total_insumos|floatformat:2 }}
+                    </td>
+                    <td class="py-3 px-3 whitespace-nowrap">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold
+                            {% if evento.status == 'Confirmado' %}bg-green-100 text-green-800
+                            {% elif evento.status == 'Em Negociação' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {{ evento.status }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 whitespace-nowrap text-right space-x-2">
+                        <a href="{% url 'evento_detalhe' evento.id %}" class="inline-block bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded text-xs font-bold">
+                            Detalhes
+                        </a>
+                        <a href="{% url 'cozinha' %}?evento_id={{ evento.id }}" class="inline-block bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200 px-2.5 py-1 rounded text-xs font-bold">
+                            Cozinha
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="py-8 text-center text-gray-400">
+                        Nenhum evento encontrado na agenda. Clique em <strong>+ Novo Evento</strong> para cadastrar.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

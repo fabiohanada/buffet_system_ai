@@ -9,7 +9,7 @@
     
     <!-- Topo / Header -->
     <header class="bg-white shadow p-4 flex justify-between items-center px-8">
-        <h1 class="text-xl font-bold text-gray-800">Sistema Buffet [MVP]</h1>
+        <h1 class="text-xl font-bold text-gray-800">Sistema Buffet AI</h1>
         <div class="text-gray-600">Usuário: <strong>Fábio</strong> | <a href="/admin/" class="text-blue-600 underline">Admin do Django</a></div>
     </header>
 
@@ -19,9 +19,9 @@
             <h2 class="text-gray-400 uppercase text-xs font-bold mb-4">Menu Lateral</h2>
             <ul class="space-y-2 text-sm font-semibold">
                 <li><a href="{% url 'dashboard' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">1. Dashboard Geral</a></li>
-                <li><a href="{% url 'agenda' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">2. Evento / Agenda</a></li>
-                <li><a href="{% url 'agenda' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">3. Agenda</a></li>
-                <li><a href="{% url 'cozinha' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">4. Cozinha (Explosão)</a></li>
+                <li><a href="{% url 'agenda' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">2. Agenda</a></li>
+                <li><a href="{% url 'cozinha' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">3. Cozinha (Explosão)</a></li>
+                <li><a href="{% url 'receitas_lista' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">4. Cardápio e Fichas</a></li>
                 <li><a href="{% url 'equipe' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">5. Escala de Equipe</a></li>
                 <li><a href="{% url 'financeiro' %}" class="block p-2 rounded hover:bg-gray-50 text-gray-700">6. Financeiro / DRE</a></li>
             </ul>

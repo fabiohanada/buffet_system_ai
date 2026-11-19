@@ -1,0 +1,119 @@
+{% extends 'buffet/base.html' %}
+
+{% block title %}Cardápio e Ficha Técnica - Buffet System{% endblock %}
+
+{% block content %}
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Cardápio e Ficha Técnica</h2>
+        <!-- Poderá depois ligar a um modal ou página de criação de receita -->
+        <a href="/admin/buffet/receita/add/" target="_blank" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded shadow text-sm">
+            ➕ Nova Receita (Admin)
+        </a>
+    </div>
+
+    <!-- Seletor de Receitas -->
+    <div class="bg-white rounded shadow p-6 mb-6">
+        <label class="block text-gray-700 font-semibold mb-2">Selecione uma Receita / Prato para Gerir a Ficha Técnica:</label>
+        <form method="get" class="flex gap-4">
+            <select name="receita_id" class="flex-1 border rounded p-2 text-gray-700" onchange="this.form.submit()">
+                <option value="">-- Escolha uma receita --</option>
+                {% for r in receitas %}
+                    <option value="{{ r.id }}" {% if receita_selecionada and receita_selecionada.id == r.id %}selected{% endif %}>
+                        {{ r.nome }} (Rendimento: {{ r.rendimento_porcoes }} porções)
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% if receita_selecionada %}
+        <!-- Grelha de Detalhes e Custos -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <!-- Informações Gerais -->
+            <div class="bg-white rounded shadow p-6 md:col-span-2">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Prato: {{ receita_selecionada.nome }}</h3>
+                <p class="text-gray-600 text-sm mb-4"><strong>Rendimento Total:</strong> {{ receita_selecionada.rendimento_porcoes }} porções</p>
+                <p class="text-gray-600 text-sm"><strong>Modo de Preparo:</strong> {{ receita_selecionada.modo_preparo|default:"Não informado." }}</p>
+            </div>
+
+            <!-- Resumo de Custos Automático -->
+            <div class="bg-white rounded shadow p-6 border-l-4 border-blue-500">
+                <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Resumo Financeiro</h4>
+                <div class="mb-3">
+                    <span class="text-gray-500 text-sm block">Custo Total da Receita</span>
+                    <span class="text-xl font-bold text-gray-800">R$ {{ receita_selecionada.custo_total_receita|floatformat:2 }}</span>
+                </div>
+                <div>
+                    <span class="text-gray-500 text-sm block">Custo por Porção (Pax)</span>
+                    <span class="text-2xl font-bold text-blue-600">R$ {{ receita_selecionada.custo_por_porcao|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Ingredientes da Ficha Técnica -->
+        <div class="bg-white rounded shadow p-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Ingredientes Utilizados nesta Receita</h3>
+            
+            <!-- Formulário para Adicionar Insumo -->
+            <form method="post" class="bg-gray-50 p-4 rounded mb-6 flex gap-4 items-end border">
+                {% csrf_token %}
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Insumo / Ingrediente</label>
+                    <select name="ingrediente_id" required class="w-full border rounded p-2 text-sm bg-white">
+                        <option value="">Selecione o ingrediente...</option>
+                        {% for ing in ingredientes_disponiveis %}
+                            <option value="{{ ing.id }}">{{ ing.nome }} ({{ ing.unidade_medida }}) - R$ {{ ing.custo_unitario }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="w-36">
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Quantidade</label>
+                    <input type="number" step="0.001" name="quantidade" placeholder="Ex: 0.500" required class="w-full border rounded p-2 text-sm bg-white">
+                </div>
+                <div>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded text-sm shadow">
+                        + Adicionar Item
+                    </button>
+                </div>
+            </form>
+
+            <!-- Tabela dos itens já adicionados -->
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b text-gray-600 text-sm bg-gray-50">
+                        <th class="py-2 px-3">Ingrediente</th>
+                        <th class="py-2 px-3">Quantidade</th>
+                        <th class="py-2 px-3">Unidade</th>
+                        <th class="py-2 px-3">Custo Unitário</th>
+                        <th class="py-2 px-3">Custo Parcial</th>
+                        <th class="py-2 px-3 text-center">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in receita_selecionada.itens.all %}
+                    <tr class="border-b text-gray-700 text-sm hover:bg-gray-50">
+                        <td class="py-3 px-3 font-semibold">{{ item.ingrediente.nome }}</td>
+                        <td class="py-3 px-3">{{ item.quantidade }}</td>
+                        <td class="py-3 px-3">{{ item.ingrediente.unidade_medida }}</td>
+                        <td class="py-3 px-3">R$ {{ item.ingrediente.custo_unitario|floatformat:2 }}</td>
+                        <td class="py-3 px-3 font-bold text-gray-900">R$ {{ item.custo_parcial|floatformat:2 }}</td>
+                        <td class="py-3 px-3 text-center">
+                            <a href="{% url 'item_receita_remover' item.id %}" class="text-red-600 hover:text-red-800 font-bold text-xs bg-red-50 px-2 py-1 rounded border border-red-200">
+                                Remover
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-6 text-center text-gray-400">Nenhum ingrediente adicionado a esta receita ainda.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="bg-white rounded shadow p-12 text-center text-gray-400">
+            <p class="text-lg">Selecione uma receita no menu acima para começar a gerir os ingredientes e custos.</p>
+        </div>
+    {% endif %}
+{% endblock %}

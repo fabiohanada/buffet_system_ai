@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import Colaborador, EscalaEvento, Evento, Ingrediente, TransacaoFinanceira
+from .models import Colaborador, EscalaEvento, Evento, Ingrediente, TransacaoFinanceira, ItemReceita, Receita
 from .forms import EventoForm
 import calendar
 from datetime import datetime
@@ -59,12 +59,17 @@ def dashboard_view(request):
   return render(request, 'buffet/dashboard.html', context)
 
 def agenda_view(request):
-    """Página 3: Agenda de Eventos"""
-    eventos = Evento.objects.all().order_by('data_hora')
-    context = {
-        'eventos': eventos,
-    }
-    return render(request, 'buffet/agenda.html', context)
+  status_filtro = request.GET.get('status', '')
+  eventos_qs = Evento.objects.all().order_by('data_hora')
+
+  if status_filtro:
+    eventos_qs = eventos_qs.filter(status__iexact=status_filtro)
+
+  context = {
+      'eventos': eventos_qs,
+      'status_filtro': status_filtro,
+  }
+  return render(request, 'buffet/agenda.html', context)
 
 
 def cozinha_view(request):
@@ -218,3 +223,43 @@ def evento_criar_view(request):
       'form': form,
   }
   return render(request, 'buffet/evento_form.html', context)
+
+def receita_lista_view(request):
+  receitas = Receita.objects.all()
+  ingredientes_disponiveis = Ingrediente.objects.all()
+
+  # Se o utilizador seleccionou uma receita para detalhar/editar
+  receita_id = request.GET.get('receita_id')
+  receita_selecionada = None
+  if receita_id:
+    receita_selecionada = get_object_or_404(Receita, id=receita_id)
+
+  # Processar a adição de um ingrediente à receita
+  if request.method == 'POST' and receita_selecionada:
+    ingrediente_id = request.POST.get('ingrediente_id')
+    quantidade = request.POST.get('quantidade')
+
+    if ingrediente_id and quantidade:
+      ingrediente = get_object_or_404(Ingrediente, id=ingrediente_id)
+      # Cria ou actualiza o item na receita
+      ItemReceita.objects.update_or_create(
+          receita=receita_selecionada,
+          ingrediente=ingrediente,
+          defaults={'quantidade': quantidade},
+      )
+      return redirect(f'/fichas/?receita_id={receita_selecionada.id}')
+
+  context = {
+      'receitas': receitas,
+      'receita_selecionada': receita_selecionada,
+      'ingredientes_disponiveis': ingredientes_disponiveis,
+  }
+  return render(request, 'buffet/receitas.html', context)
+
+
+# View rápida para apagar um item da receita
+def item_receita_remover_view(request, item_id):
+  item = get_object_or_404(ItemReceita, id=item_id)
+  receita_id = item.receita.id
+  item.delete()
+  return redirect(f'/fichas/?receita_id={receita_id}')
